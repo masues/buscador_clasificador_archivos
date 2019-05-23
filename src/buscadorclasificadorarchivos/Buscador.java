@@ -3,8 +3,9 @@ package buscadorclasificadorarchivos;
 import java.io.File;
 
 public class Buscador extends Thread{
-    public Buscador(File ruta){
+    public Buscador(File ruta,int [] contador){
         this.Ruta = ruta;
+        this.contador = contador;
     }
     //Constructor para (sub carpetas)
     public Buscador(File ruta, String tab, boolean esPrimero, 
@@ -51,19 +52,21 @@ public class Buscador extends Thread{
     }
     
     private void getArbolDirectorios(File x){
-        boolean haySubdirectorios = false;
+        //boolean haySubdirectorios = false;
         File [] lista = x.listFiles();
         for(File y:lista){
             if (y.isDirectory()){
+                System.out.println(getName()+" DIRECTORIO: "+y.getPath());
                 getArbolDirectorios(y);
-                haySubdirectorios = true;
+                //haySubdirectorios = true;
             }    
         }
-        if (!haySubdirectorios)
-            System.out.println(getName()+" DIRECTORIO: "+x.getPath());
+        //if (!haySubdirectorios)
+            
     }
     
     File Ruta;
     String Tab="";
     boolean esPrimero = true;
+    int [] contador;
 }
