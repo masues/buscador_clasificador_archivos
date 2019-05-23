@@ -9,11 +9,12 @@ public class Buscador extends Thread{
     }
     //Constructor para (sub carpetas)
     public Buscador(File ruta, String tab, boolean esPrimero, 
-        String nomSubcarpeta){ 
+        String nomSubcarpeta, int [] contador){ 
         this.Ruta = ruta;
         this.Tab = tab;
         this.esPrimero=esPrimero;
         setName(getName()+" ("+nomSubcarpeta+") ");
+        this.contador = contador;
     }
     @Override
     public void run()
@@ -42,7 +43,7 @@ public class Buscador extends Thread{
                 System.out.println("... creando hilo para el directorio "
                     +Lista[i].getName());
                 new Buscador(Lista[i],this.Tab+"\t",false,
-                    Lista[i].getName()).start();
+                    Lista[i].getName(),this.contador).start();
             }else{
                 System.out.println(Tab+this.getName()+": Archivo: "
                     +Lista[i].getName());
