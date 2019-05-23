@@ -7,8 +7,10 @@ public class BuscadorClasificadorArchivos {
         String nomDirectorio = "/home/mario/Pictures";//modificar para usar 
         //una ruta de su computadora
         int numElementos = 2;
+        int [] contador = new int[numElementos];
+        
         File archivo = new File(nomDirectorio);
-        Buscador buscador = new Buscador(archivo);
+        Buscador buscador = new Buscador(archivo,contador);
         buscador.start();
         //System.out.println("TERMINÓ: main");
     }

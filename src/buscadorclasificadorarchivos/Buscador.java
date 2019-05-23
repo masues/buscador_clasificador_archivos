@@ -3,16 +3,18 @@ package buscadorclasificadorarchivos;
 import java.io.File;
 
 public class Buscador extends Thread{
-    public Buscador(File ruta){
+    public Buscador(File ruta,int [] contador){
         this.Ruta = ruta;
+        this.contador = contador;
     }
     //Constructor para (sub carpetas)
     public Buscador(File ruta, String tab, boolean esPrimero, 
-        String nomSubcarpeta){ 
+        String nomSubcarpeta, int [] contador){ 
         this.Ruta = ruta;
         this.Tab = tab;
         this.esPrimero=esPrimero;
         setName(getName()+" ("+nomSubcarpeta+") ");
+        this.contador = contador;
     }
     @Override
     public void run()
@@ -41,7 +43,7 @@ public class Buscador extends Thread{
                 System.out.println("... creando hilo para el directorio "
                     +Lista[i].getName());
                 new Buscador(Lista[i],this.Tab+"\t",false,
-                    Lista[i].getName()).start();
+                    Lista[i].getName(),this.contador).start();
             }else{
                 System.out.println(Tab+this.getName()+": Archivo: "
                     +Lista[i].getName());
@@ -51,19 +53,17 @@ public class Buscador extends Thread{
     }
     
     private void getArbolDirectorios(File x){
-        boolean haySubdirectorios = false;
         File [] lista = x.listFiles();
         for(File y:lista){
             if (y.isDirectory()){
+                System.out.println(getName()+" DIRECTORIO: "+y.getPath());
                 getArbolDirectorios(y);
-                haySubdirectorios = true;
             }    
-        }
-        if (!haySubdirectorios)
-            System.out.println(getName()+" DIRECTORIO: "+x.getPath());
+        }   
     }
     
     File Ruta;
     String Tab="";
     boolean esPrimero = true;
+    int [] contador;
 }
