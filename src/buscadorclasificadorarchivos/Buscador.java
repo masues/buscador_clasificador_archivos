@@ -1,6 +1,7 @@
 package buscadorclasificadorarchivos;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,22 +41,33 @@ public class Buscador extends Thread{
         }
         
         File [] Lista = Ruta.listFiles();
+        ArrayList<Buscador> hilos = new ArrayList<>();
 
-        for (int i=0; i<Lista.length; i++) {
-            if(Lista[i].isDirectory()){
-                System.out.println(Tab+this.getName()+": Directorio: "
-                    +Lista[i].getName());
-                System.out.println("... creando hilo para el directorio "
-                    +Lista[i].getName());
-                new Buscador(Lista[i],this.Tab+"\t",false,
-                    Lista[i].getName(),this.contador,this.disponible).start();
+        for (File x : Lista) {
+            if (x.isDirectory()) {
+                System.out.println(Tab+this.getName()+": Directorio: " +
+                        x.getName());
+                System.out.println("... creando hilo para el directorio " + 
+                        x.getName());
+                Buscador newHilo = new Buscador(x, this.Tab+"\t", false,
+                        x.getName(),this.contador, this.disponible);
+                newHilo.start();
+                hilos.add(newHilo);
                 contar(1);//incrementa el contador de directorios
-            }else{
-                System.out.println(Tab+this.getName()+": Archivo: "
-                    +Lista[i].getName());
+            } else {
+                System.out.println(Tab+this.getName()+": Archivo: " +
+                        x.getName());
                 contar(0);
             }
         }
+        hilos.forEach((Buscador x) -> {
+            try {
+                (x).join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE,
+                        null, ex);
+            }
+        });
         System.out.println("TERMINÓ: "+getName());
     }
     
