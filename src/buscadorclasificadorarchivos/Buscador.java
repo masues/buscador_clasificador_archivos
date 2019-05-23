@@ -52,17 +52,13 @@ public class Buscador extends Thread{
     }
     
     private void getArbolDirectorios(File x){
-        //boolean haySubdirectorios = false;
         File [] lista = x.listFiles();
         for(File y:lista){
             if (y.isDirectory()){
                 System.out.println(getName()+" DIRECTORIO: "+y.getPath());
                 getArbolDirectorios(y);
-                //haySubdirectorios = true;
             }    
-        }
-        //if (!haySubdirectorios)
-            
+        }   
     }
     
     File Ruta;
