@@ -27,12 +27,12 @@ public class BuscadorClasificadorArchivos {
         }
         
         synchronized (buscador){
-            try {
+            /*try {
                 buscador.ultimo.join();
                 System.out.println("Ultimo hilo:"+buscador.ultimo.getName());
             } catch (InterruptedException ex) {
                 Logger.getLogger(BuscadorClasificadorArchivos.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
             System.out.println("=================================================");
             System.out.println("Main: Directorios: "+contador[1]+",  Archivos: "+contador[0]);
             System.out.println("=================================================");
