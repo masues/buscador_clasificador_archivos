@@ -12,7 +12,6 @@ public class Buscador extends Thread{
     boolean esPrimero = true;
     int [] contador;
     boolean disponible;
-    Thread ultimo = Thread.currentThread();
     
     public Buscador(File ruta,int [] contador){
         this.Ruta = ruta;
@@ -28,7 +27,6 @@ public class Buscador extends Thread{
         setName(getName()+" ("+nomSubcarpeta+") ");
         this.contador = contador;
         this.disponible = disponible;
-        //this.ultimo = ultimo;
         this.start();
     }
     @Override
@@ -50,7 +48,11 @@ public class Buscador extends Thread{
         }
         
         File [] Lista = Ruta.listFiles();
-
+        
+        //Arreglo para guardar hilos que se deben esperar
+        Buscador esperar[] = new Buscador[contarDir(Lista)];
+        int dir = 0;
+        
         for (int i=0; i<Lista.length; i++) {
             if(Lista[i].isDirectory()){
                 contar(1);
@@ -58,15 +60,27 @@ public class Buscador extends Thread{
                     +Lista[i].getName());
                 System.out.println("... creando hilo para el directorio "
                     +Lista[i].getName());
-                actualizaUltimo(new Buscador(Lista[i],this.Tab+"\t",false,
-                    Lista[i].getName(),this.contador, this.disponible));     //Agregar start
+                esperar[dir] = new Buscador(Lista[i],"\t",false,
+                    Lista[i].getName(),this.contador, this.disponible);
+                dir = dir + 1;
             }else{
                 contar(0);
-                System.out.println(Tab+this.getName()+": Archivo: "
-                    +Lista[i].getName());
+                if(this.esPrimero){
+                    System.out.println(Tab+this.getName()+": Archivo: "
+                        +Lista[i].getName());
+                }else{
+                    System.out.println(Tab+this.getName()+"-->: Archivo: "
+                        +Lista[i].getName());
+                }
             }
         }
-        esperar();
+        for(Buscador n : esperar){
+            try {
+                n.join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         System.out.println("TERMINÓ: "+getName());
     }
     
@@ -77,7 +91,7 @@ public class Buscador extends Thread{
                 System.out.println(getName()+" DIRECTORIO: "+y.getPath());
                 getArbolDirectorios(y);
             }    
-        }   
+        }
     }
     
     //Procedimiento sincronizado para contar
@@ -100,18 +114,15 @@ public class Buscador extends Thread{
         notifyAll();
     }
     
-    //Procedimiento para actualizar ultimo hilo
-    private synchronized void actualizaUltimo(Thread a){
-        this.ultimo = a;
-        notifyAll();
+    //Contar Directorios
+    private int contarDir(File Lista[]){
+        int n = 0;
+        for(File f : Lista){
+            if(f.isDirectory()){
+                n = n + 1;
+            }
+        }
+        return n;
     }
     
-    //procedimiento para esperar hilos internos
-    private synchronized void esperar(){
-        try {
-            this.ultimo.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

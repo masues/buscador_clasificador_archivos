@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 public class BuscadorClasificadorArchivos {
     public static void main(String[] args) {
         //Datos de entrada
-        String nomDirectorio = "C:\\Users\\ASUS\\Documents\\Sistemas Operativos";//modificar para usar 
+        String nomDirectorio = "C:\\Users\\ASUS\\Documents\\Lab Bases de Datos";//modificar para usar 
         //una ruta de su computadora
         int numElementos = 2;
         int [] contador = new int[numElementos];
