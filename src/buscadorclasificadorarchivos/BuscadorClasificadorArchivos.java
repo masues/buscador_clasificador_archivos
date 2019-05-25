@@ -6,15 +6,10 @@ import java.util.logging.Logger;
 public class BuscadorClasificadorArchivos {
     public static void main(String[] args) {
         //Datos de entrada
-        String nomDirectorio = "C:\\Users\\ASUS\\Documents\\Lab Bases de Datos";//modificar para usar 
+        String nomDirectorio = "/tmp/prueba";//modificar para usar 
         //una ruta de su computadora
         int numElementos = 2;
         int [] contador = new int[numElementos];
-        
-        //Inicializacion del contador
-        for(int n : contador){
-            n = 0;
-        }
         
         File archivo = new File(nomDirectorio);
         Buscador buscador = new Buscador(archivo,contador);
@@ -26,17 +21,9 @@ public class BuscadorClasificadorArchivos {
             Logger.getLogger(BuscadorClasificadorArchivos.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        synchronized (buscador){
-            /*try {
-                buscador.ultimo.join();
-                System.out.println("Ultimo hilo:"+buscador.ultimo.getName());
-            } catch (InterruptedException ex) {
-                Logger.getLogger(BuscadorClasificadorArchivos.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
-            System.out.println("=================================================");
-            System.out.println("Main: Directorios: "+contador[1]+",  Archivos: "+contador[0]);
-            System.out.println("=================================================");
-            System.out.println("TERMINÓ: main");
-        }
+        System.out.println("=================================================");
+        System.out.println("Main: Directorios: "+contador[1]+",  Archivos: "+contador[0]);
+        System.out.println("=================================================");
+        System.out.println("TERMINÓ: main");
     }
 }
