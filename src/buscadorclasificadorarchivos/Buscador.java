@@ -29,8 +29,9 @@ public class Buscador extends Thread{
         this.start();
     }
     @Override
-    public void run()
-    {   if (esPrimero){
+    public void run(){
+        File [] Lista = Ruta.listFiles();
+        if (esPrimero){
             System.out.println(
                     "=================================================");
             System.out.println("Origen:\t"+Ruta.getPath());
@@ -40,18 +41,17 @@ public class Buscador extends Thread{
                     "============== Árbol de directorios =============");
         
             //Obtiene el árbol de directorios si es el hilo creado por el main
-            getArbolDirectorios(Ruta);
+            if(Lista!=null)
+                getArbolDirectorios(Ruta);
         
             System.out.print("\n"+
                     "===================== Listado ==================="+"\n");
         }
         
-        File [] Lista = Ruta.listFiles();
-        
-        //Arreglo para guardar hilos que se deben esperar
-        Buscador esperar[] = new Buscador[contarDir(Lista)];
-        int dir = 0;
         if(Lista != null){
+            //Arreglo para guardar hilos que se deben esperar
+            Buscador esperar[] = new Buscador[contarDir(Lista)];
+            int dir = 0;
             for (int i=0; i<Lista.length; i++) {
                 if(Lista[i].isDirectory()){
                     contar(1);
