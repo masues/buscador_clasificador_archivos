@@ -52,35 +52,37 @@ public class Buscador extends Thread{
         Buscador esperar[] = new Buscador[contarDir(Lista)];
         int dir = 0;
         
-        for (int i=0; i<Lista.length; i++) {
-            if(Lista[i].isDirectory()){
-                contar(1);
-                System.out.println(Tab+this.getName()+": Directorio: "
-                    +Lista[i].getName());
-                System.out.println("... creando hilo para el directorio "
-                    +Lista[i].getName());
-                esperar[dir] = new Buscador(Lista[i],"\t",false,
-                    Lista[i].getName(),this.contador, this.disponible);
-                dir = dir + 1;
-            }else{
-                contar(0);
-                if(this.esPrimero){
-                    System.out.println(Tab+this.getName()+": Archivo: "
+        if(Lista != null){
+            for (int i=0; i<Lista.length; i++) {
+                if(Lista[i].isDirectory()){
+                    contar(1);
+                    System.out.println(Tab+this.getName()+": Directorio: "
                         +Lista[i].getName());
+                    System.out.println("... creando hilo para el directorio "
+                        +Lista[i].getName());
+                    esperar[dir] = new Buscador(Lista[i],"\t",false,
+                        Lista[i].getName(),this.contador, this.disponible);
+                    dir = dir + 1;
                 }else{
-                    System.out.println(Tab+this.getName()+"-->: Archivo: "
-                        +Lista[i].getName());
+                    contar(0);
+                    if(this.esPrimero){
+                        System.out.println(Tab+this.getName()+": Archivo: "
+                            +Lista[i].getName());
+                    }else{
+                        System.out.println(Tab+this.getName()+"-->: Archivo: "
+                            +Lista[i].getName());
+                    }
                 }
             }
-        }
-        for(Buscador n : esperar){
-            try {
-                n.join();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
+            for(Buscador n : esperar){
+                try {
+                    n.join();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            System.out.println("TERMINÓ: "+getName());
         }
-        System.out.println("TERMINÓ: "+getName());
     }
     
     private void getArbolDirectorios(File x){
