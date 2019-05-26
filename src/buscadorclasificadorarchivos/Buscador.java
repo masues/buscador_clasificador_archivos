@@ -1,12 +1,17 @@
 package buscadorclasificadorarchivos;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Buscador extends Thread{
-    //constructor para directorio raíz (inicial)
+    
+    File Ruta;
+    String Tab="";
+    boolean esPrimero = true;
+    int [] contador;
+    boolean disponible;
+    
     public Buscador(File ruta,int [] contador){
         this.Ruta = ruta;
         this.contador = contador;
@@ -14,17 +19,19 @@ public class Buscador extends Thread{
     }
     //Constructor para (sub carpetas)
     public Buscador(File ruta, String tab, boolean esPrimero, 
-        String nomSubcarpeta, int [] contador,boolean disponible){ 
+        String nomSubcarpeta, int [] contador, boolean disponible){ 
         this.Ruta = ruta;
         this.Tab = tab;
         this.esPrimero=esPrimero;
         setName(getName()+" ("+nomSubcarpeta+") ");
         this.contador = contador;
         this.disponible = disponible;
+        this.start();
     }
     @Override
-    public void run()
-    {   if (esPrimero){
+    public void run(){
+        File [] Lista = Ruta.listFiles();
+        if (esPrimero){
             System.out.println(
                     "=================================================");
             System.out.println("Origen:\t"+Ruta.getPath());
@@ -34,41 +41,47 @@ public class Buscador extends Thread{
                     "============== Árbol de directorios =============");
         
             //Obtiene el árbol de directorios si es el hilo creado por el main
-            getArbolDirectorios(Ruta);
+            if(Lista!=null)
+                getArbolDirectorios(Ruta);
         
             System.out.print("\n"+
                     "===================== Listado ==================="+"\n");
         }
         
-        File [] Lista = Ruta.listFiles();
-        ArrayList<Buscador> hilos = new ArrayList<>();
-
-        for (File x : Lista) {
-            if (x.isDirectory()) {
-                System.out.println(Tab+this.getName()+": Directorio: " +
-                        x.getName());
-                System.out.println("... creando hilo para el directorio " + 
-                        x.getName());
-                Buscador newHilo = new Buscador(x, this.Tab+"\t", false,
-                        x.getName(),this.contador, this.disponible);
-                newHilo.start();
-                hilos.add(newHilo);
-                contar(1);//incrementa el contador de directorios
-            } else {
-                System.out.println(Tab+this.getName()+": Archivo: " +
-                        x.getName());
-                contar(0);
+        if(Lista != null){
+            //Arreglo para guardar hilos que se deben esperar
+            Buscador esperar[] = new Buscador[contarDir(Lista)];
+            int dir = 0;
+            for (int i=0; i<Lista.length; i++) {
+                if(Lista[i].isDirectory()){
+                    contar(1);
+                    System.out.println(Tab+this.getName()+": Directorio: "
+                        +Lista[i].getName());
+                    System.out.println("... creando hilo para el directorio "
+                        +Lista[i].getName());
+                    esperar[dir] = new Buscador(Lista[i],"\t",false,
+                        Lista[i].getName(),this.contador, this.disponible);
+                    dir = dir + 1;
+                }else{
+                    contar(0);
+                    if(this.esPrimero){
+                        System.out.println(Tab+this.getName()+": Archivo: "
+                            +Lista[i].getName());
+                    }else{
+                        System.out.println(Tab+this.getName()+"-->: Archivo: "
+                            +Lista[i].getName());
+                    }
+                }
             }
+            for(Buscador n : esperar){
+                try {
+                    n.join();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            System.out.println("TERMINÓ: "+getName());
         }
-        hilos.forEach((Buscador x) -> {
-            try {
-                (x).join();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE,
-                        null, ex);
-            }
-        });
-        System.out.println("TERMINÓ: "+getName());
     }
     
     private void getArbolDirectorios(File x){
@@ -78,13 +91,12 @@ public class Buscador extends Thread{
                 System.out.println(getName()+" DIRECTORIO: "+y.getPath());
                 getArbolDirectorios(y);
             }    
-        }   
+        }
     }
     
-    private synchronized void contar(int n){
-        //si n es cero, se refiere a archivos
-        String mensaje = (n==0) ? "archivos":"directorios";
-        if(!disponible){
+    //Procedimiento sincronizado para contar
+    private synchronized void contar(int pos){
+        if(disponible == false){
             try {
                 wait();
             } catch (InterruptedException ex) {
@@ -92,16 +104,25 @@ public class Buscador extends Thread{
             }
         }
         disponible = false;
-        contador[n]++;
-        System.out.println("Registro "+mensaje+": "+contador[n]
-            +" ("+getName()+")");
+        contador[pos] = contador[pos] + 1;
+        if(pos == 0){
+            System.out.println("\tREGISTRO ARCHIVOS: "+contador[pos]+"  ("+getName()+")");
+        }else if(pos == 1){
+            System.out.println("\tREGISTRO DIRECTORIOS: "+contador[pos]+"  ("+getName()+")");
+        }
         disponible = true;
         notifyAll();
     }
     
-    File Ruta;
-    String Tab="";
-    boolean esPrimero = true;
-    int [] contador;
-    boolean disponible;
+    //Contar Directorios
+    private int contarDir(File Lista[]){
+        int n = 0;
+        for(File f : Lista){
+            if(f.isDirectory()){
+                n = n + 1;
+            }
+        }
+        return n;
+    }
+    
 }
