@@ -80,8 +80,8 @@ public class Buscador extends Thread{
                     Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            System.out.println("TERMINÓ: "+getName());
         }
+        System.out.println("TERMINÓ: "+getName());
     }
     
     private void getArbolDirectorios(File x){
