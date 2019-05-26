@@ -49,7 +49,6 @@ public class Buscador extends Thread{
         }
         switch (contador.length){
             case 1:
-                System.out.println("ENTRA A CASO 1");
                 if(Lista != null){
                     //Arreglo para guardar hilos que se deben esperar
                     Buscador esperar[] = new Buscador[contarDir(Lista)];
@@ -87,7 +86,6 @@ public class Buscador extends Thread{
                 }
                 break;
             case 2:
-                System.out.println("ENTRA A CASO 2");
                 if(Lista != null){
                     //Arreglo para guardar hilos que se deben esperar
                     Buscador esperar[] = new Buscador[contarDir(Lista)];
