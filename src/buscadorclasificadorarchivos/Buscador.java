@@ -51,7 +51,6 @@ public class Buscador extends Thread{
         //Arreglo para guardar hilos que se deben esperar
         Buscador esperar[] = new Buscador[contarDir(Lista)];
         int dir = 0;
-        
         if(Lista != null){
             for (int i=0; i<Lista.length; i++) {
                 if(Lista[i].isDirectory()){
