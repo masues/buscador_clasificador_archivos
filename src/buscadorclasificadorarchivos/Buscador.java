@@ -29,8 +29,9 @@ public class Buscador extends Thread{
         this.start();
     }
     @Override
-    public void run()
-    {   if (esPrimero){
+    public void run(){
+        File [] Lista = Ruta.listFiles();
+        if (esPrimero){
             System.out.println(
                     "=================================================");
             System.out.println("Origen:\t"+Ruta.getPath());
@@ -40,45 +41,88 @@ public class Buscador extends Thread{
                     "============== Árbol de directorios =============");
         
             //Obtiene el árbol de directorios si es el hilo creado por el main
-            getArbolDirectorios(Ruta);
+            if(Lista!=null)
+                getArbolDirectorios(Ruta);
         
             System.out.print("\n"+
                     "===================== Listado ==================="+"\n");
         }
-        
-        File [] Lista = Ruta.listFiles();
-        
-        //Arreglo para guardar hilos que se deben esperar
-        Buscador esperar[] = new Buscador[contarDir(Lista)];
-        int dir = 0;
-        
-        for (int i=0; i<Lista.length; i++) {
-            if(Lista[i].isDirectory()){
-                contar(1);
-                System.out.println(Tab+this.getName()+": Directorio: "
-                    +Lista[i].getName());
-                System.out.println("... creando hilo para el directorio "
-                    +Lista[i].getName());
-                esperar[dir] = new Buscador(Lista[i],"\t",false,
-                    Lista[i].getName(),this.contador, this.disponible);
-                dir = dir + 1;
-            }else{
-                contar(0);
-                if(this.esPrimero){
-                    System.out.println(Tab+this.getName()+": Archivo: "
-                        +Lista[i].getName());
-                }else{
-                    System.out.println(Tab+this.getName()+"-->: Archivo: "
-                        +Lista[i].getName());
+        switch (contador.length){
+            case 1:
+                if(Lista != null){
+                    //Arreglo para guardar hilos que se deben esperar
+                    Buscador esperar[] = new Buscador[contarDir(Lista)];
+                    int dir = 0;
+                    for (int i=0; i<Lista.length; i++) {
+                        if(Lista[i].isDirectory()){
+                            System.out.println(Tab+this.getName()+
+                                    ": Directorio: "+Lista[i].getName());
+                            System.out.println(
+                                "... creando hilo para el directorio "
+                                +Lista[i].getName());
+                            esperar[dir] = new Buscador(Lista[i],"\t",false,
+                                Lista[i].getName(),this.contador,
+                                this.disponible);
+                            dir ++;
+                        }else{
+                            contar(0);
+                            if(this.esPrimero){
+                                System.out.println(Tab+this.getName()+
+                                        ": Archivo: "+Lista[i].getName());
+                            }else{
+                                System.out.println(Tab+this.getName()
+                                    +"-->: Archivo: "+Lista[i].getName());
+                            }
+                        }
+                    }
+                    for(Buscador n : esperar){
+                        try {
+                            n.join();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Buscador.class.getName()).log(
+                                Level.SEVERE, null, ex);
+                        }
+                    }
                 }
-            }
-        }
-        for(Buscador n : esperar){
-            try {
-                n.join();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                break;
+            case 2:
+                if(Lista != null){
+                    //Arreglo para guardar hilos que se deben esperar
+                    Buscador esperar[] = new Buscador[contarDir(Lista)];
+                    int dir = 0;
+                    for (int i=0; i<Lista.length; i++) {
+                        if(Lista[i].isDirectory()){
+                            contar(1);
+                            System.out.println(Tab+this.getName()+
+                                    ": Directorio: "+Lista[i].getName());
+                            System.out.println(
+                                "... creando hilo para el directorio "
+                                +Lista[i].getName());
+                            esperar[dir] = new Buscador(Lista[i],"\t",false,
+                                Lista[i].getName(),this.contador,
+                                this.disponible);
+                            dir ++;
+                        }else{
+                            contar(0);
+                            if(this.esPrimero){
+                                System.out.println(Tab+this.getName()+
+                                        ": Archivo: "+Lista[i].getName());
+                            }else{
+                                System.out.println(Tab+this.getName()
+                                    +"-->: Archivo: "+Lista[i].getName());
+                            }
+                        }
+                    }
+                    for(Buscador n : esperar){
+                        try {
+                            n.join();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Buscador.class.getName()).log(
+                                Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                break;
         }
         System.out.println("TERMINÓ: "+getName());
     }
@@ -99,15 +143,18 @@ public class Buscador extends Thread{
             try {
                 wait();
             } catch (InterruptedException ex) {
-                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE,
+                    null, ex);
             }
         }
         disponible = false;
         contador[pos] = contador[pos] + 1;
         if(pos == 0){
-            System.out.println("\tREGISTRO ARCHIVOS: "+contador[pos]+"  ("+getName()+")");
+            System.out.println("\tREGISTRO ARCHIVOS: "+contador[pos]
+                +"  ("+getName()+")");
         }else if(pos == 1){
-            System.out.println("\tREGISTRO DIRECTORIOS: "+contador[pos]+"  ("+getName()+")");
+            System.out.println("\tREGISTRO DIRECTORIOS: "+contador[pos]
+                +"  ("+getName()+")");
         }
         disponible = true;
         notifyAll();
