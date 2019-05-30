@@ -14,7 +14,6 @@ public class Controlador {
 
     
     
-    //Procedimiento sincronizado para contar
     public synchronized void contar(int pos, String nombre){
         if(disponible == false){
             try {
