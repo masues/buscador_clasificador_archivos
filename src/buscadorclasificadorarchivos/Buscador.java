@@ -19,7 +19,6 @@ public class Buscador extends Thread{
         this.disponible = true;
         this.controlador = new Controlador(contador,disponible);
     }
-    //Constructor para (sub carpetas)
     public Buscador(File ruta, String tab, boolean esPrimero, 
         String nomSubcarpeta,int [] contador, Controlador controlador){ 
         this.Ruta = ruta;
@@ -42,7 +41,6 @@ public class Buscador extends Thread{
             System.out.println(
                     "============== Árbol de directorios =============");
         
-            //Obtiene el árbol de directorios si es el hilo creado por el main
             if(Lista!=null)
                 getArbolDirectorios(Ruta);
         
@@ -52,7 +50,6 @@ public class Buscador extends Thread{
         switch (contador.length){
             case 1:
                 if(Lista != null){
-                    //Arreglo para guardar hilos que se deben esperar
                     Buscador esperar[] = new Buscador[contarDir(Lista)];
                     int dir = 0;
                     for (int i=0; i<Lista.length; i++) {
@@ -88,7 +85,6 @@ public class Buscador extends Thread{
                 break;
             case 2:
                 if(Lista != null){
-                    //Arreglo para guardar hilos que se deben esperar
                     Buscador esperar[] = new Buscador[contarDir(Lista)];
                     int dir = 0;
                     for (int i=0; i<Lista.length; i++) {
@@ -138,7 +134,6 @@ public class Buscador extends Thread{
     }
 
     
-    //Contar Directorios
     private int contarDir(File Lista[]){
         int n = 0;
         for(File f : Lista){
