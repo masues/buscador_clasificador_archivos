@@ -8,7 +8,7 @@ public class BuscadorClasificadorArchivos {
     public static void main(String[] args) {
         
         String nomDirectorio; 
-        int numElementos = 2;
+        int numElementos;
         
         Scanner teclado = new Scanner(System.in);
         System.out.println("Introduzca la ruta: ");
