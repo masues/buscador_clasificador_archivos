@@ -11,21 +11,23 @@ public class Buscador extends Thread{
     boolean esPrimero = true;
     int [] contador;
     boolean disponible;
+    Controlador controlador;
     
     public Buscador(File ruta,int [] contador){
         this.Ruta = ruta;
         this.contador = contador;
         this.disponible = true;
+        this.controlador = new Controlador(contador,disponible);
     }
     //Constructor para (sub carpetas)
     public Buscador(File ruta, String tab, boolean esPrimero, 
-        String nomSubcarpeta, int [] contador, boolean disponible){ 
+        String nomSubcarpeta,int [] contador, Controlador controlador){ 
         this.Ruta = ruta;
         this.Tab = tab;
         this.esPrimero=esPrimero;
         setName(getName()+" ("+nomSubcarpeta+") ");
-        this.contador = contador;
-        this.disponible = disponible;
+        this.contador=contador;
+        this.controlador=controlador;
         this.start();
     }
     @Override
@@ -61,11 +63,10 @@ public class Buscador extends Thread{
                                 "... creando hilo para el directorio "
                                 +Lista[i].getName());
                             esperar[dir] = new Buscador(Lista[i],"\t",false,
-                                Lista[i].getName(),this.contador,
-                                this.disponible);
+                                Lista[i].getName(),this.contador,this.controlador);
                             dir ++;
                         }else{
-                            contar(0);
+                            this.controlador.contar(0, getName());
                             if(this.esPrimero){
                                 System.out.println(Tab+this.getName()+
                                         ": Archivo: "+Lista[i].getName());
@@ -92,18 +93,17 @@ public class Buscador extends Thread{
                     int dir = 0;
                     for (int i=0; i<Lista.length; i++) {
                         if(Lista[i].isDirectory()){
-                            contar(1);
+                            this.controlador.contar(1,getName());
                             System.out.println(Tab+this.getName()+
                                     ": Directorio: "+Lista[i].getName());
                             System.out.println(
                                 "... creando hilo para el directorio "
                                 +Lista[i].getName());
                             esperar[dir] = new Buscador(Lista[i],"\t",false,
-                                Lista[i].getName(),this.contador,
-                                this.disponible);
+                                Lista[i].getName(),this.contador,this.controlador);
                             dir ++;
                         }else{
-                            contar(0);
+                            this.controlador.contar(0, getName());
                             if(this.esPrimero){
                                 System.out.println(Tab+this.getName()+
                                         ": Archivo: "+Lista[i].getName());
@@ -136,29 +136,7 @@ public class Buscador extends Thread{
             }    
         }
     }
-    
-    //Procedimiento sincronizado para contar
-    private synchronized void contar(int pos){
-        if(disponible == false){
-            try {
-                wait();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE,
-                    null, ex);
-            }
-        }
-        disponible = false;
-        contador[pos] = contador[pos] + 1;
-        if(pos == 0){
-            System.out.println("\tREGISTRO ARCHIVOS: "+contador[pos]
-                +"  ("+getName()+")");
-        }else if(pos == 1){
-            System.out.println("\tREGISTRO DIRECTORIOS: "+contador[pos]
-                +"  ("+getName()+")");
-        }
-        disponible = true;
-        notifyAll();
-    }
+
     
     //Contar Directorios
     private int contarDir(File Lista[]){
